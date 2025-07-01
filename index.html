@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes Wranglers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Paytone+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom Properties for Colors */
+        :root {
+            --bg-pink-peach: #FFD5D4;
+            --dark-blue: #2D407A;
+            --reddish-brown: #BF493D;
+            --yellow-orange: #FFC107;
+            --white: #FFFFFF;
+            --text-dark: #333; /* General dark text */
+            --light-grey: #f0f0f0; /* For section backgrounds if needed */
+        }
+
+        /* Basic Resets & Font Import */
+        body {
+            margin: 0;
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--bg-pink-peach); /* Main background color */
+            display: flex; /* For centering the content-oval vertically if needed */
+            flex-direction: column; /* Allow header/footer to stack */
+            justify-content: flex-start; /* Start content from top */
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            position: relative; /* For canvas positioning */
+            padding-top: 80px; /* Space for fixed header */
+        }
+
+        /* Canvas for background doodles */
+        #doodleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Send it to the back */
+            opacity: 0.7; /* Adjust transparency as needed */
+        }
+
+        /* Fixed Header with Logo */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100; /* Ensure it's above other content */
+        }
+
+        .logo {
+            height: 50px; /* Adjust logo size */
+            margin-right: 15px;
+            border-radius: 50%; /* If you want a round logo */
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 700px; /* Adjust max-width to control overall size */
+            text-align: center;
+            padding: 20px; /* Padding around the content for smaller screens */
+            box-sizing: border-box; /* Include padding in width calculation */
+            margin-top: 20px; /* Space below fixed header */
+            position: relative; /* For z-index to be above canvas */
+            z-index: 1; /* Ensure content is above canvas */
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .site-title {
+            font-family: 'Paytone One', sans-serif;
+            font-size: 4.5em; /* Large size */
+            color: var(--dark-blue);
+            margin-bottom: 5px;
+            line-height: 1; /* Tighter line height */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Slight shadow for pop */
+        }
+
+        .tagline {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--reddish-brown);
+            margin-top: 0;
+            letter-spacing: 1px;
+        }
+
+        .content-oval {
+            background-color: var(--white);
+            border-radius: 50px; /* Very rounded corners, like the poster's oval */
+            padding: 40px 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+            margin: 20px 0; /* Space from header/footer */
+            box-sizing: border-box;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px 0; /* Padding inside sections within the oval */
+        }
+
+        .section-title {
+            font-family: 'Quicksand', sans-serif; /* Keep consistent with body, but bold */
+            font-weight: 700;
+            font-size: 1.8em;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .action-section .btn {
+            display: inline-block;
+            background-color: var(--yellow-orange);
+            background-image: linear-gradient(to bottom, #FFD040, #FFC107); /* Slight gradient */
+            color: var(--white);
+            padding: 18px 50px; /* Larger button */
+            border-radius: 50px; /* Very rounded */
+            text-decoration: none;
+            font-family: 'Paytone One', sans-serif; /* Match "GET NOW" font */
+            font-size: 1.8em; /* Large text on button */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            border: none; /* Remove default button border */
+        }
+
+        .action-section .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+        }
+
+        .info-text, .price-text {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            color: var(--reddish-brown);
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .price-text {
+            font-size: 1.5em; /* Make price stand out */
+            color: var(--dark-blue); /* Or a slightly darker orange if preferred */
+        }
+
+
+        /* Order Instructions Section */
+        .order-instructions p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .instagram-btn {
+            display: inline-block;
+            background-color: #C13584; /* Instagram purple/pink */
+            color: var(--white);
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .instagram-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .email-display {
+            font-family: 'Paytone One', sans-serif; /* Make email stand out */
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--reddish-brown);
+            background-color: rgba(255, 255, 255, 0.7); /* Slightly translucent white background */
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+            word-break: break-all; /* For long email addresses */
+        }
+
+        /* Listed Notes Styling */
+        .note-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Smaller notes, more fit */
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .note-item {
+            background-color: var(--light-grey); /* Light grey background for each note item */
+            padding: 20px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: left;
+        }
+
+        .note-item h3 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .note-item p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .note-item a {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--reddish-brown); /* Match text color */
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid var(--reddish-brown); /* Underline effect */
+            padding-bottom: 2px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .note-item a:hover {
+            color: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+
+        .contact-prompt {
+            font-style: italic;
+            margin-top: 30px;
+            color: #555;
+        }
+
+        /* Footer Styling */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.5); /* Slightly transparent footer on background */
+            color: var(--text-dark);
+            font-size: 0.9em;
+            border-top: 2px dashed rgba(255, 255, 255, 0.4); /* Subtle dashed line */
+            border-radius: 20px; /* Match main content oval */
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Space from bottom of page */
+        }
+
+        .footer a {
+            color: var(--reddish-brown);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px; /* Adjust for smaller fixed header */
+            }
+            .fixed-header {
+                padding: 5px 15px;
+            }
+            .logo {
+                height: 40px;
+            }
+            .site-title {
+                font-size: 3.5em; /* Smaller on mobile */
+            }
+            .tagline {
+                font-size: 1em;
+            }
+            .content-oval {
+                border-radius: 30px; /* Slightly less rounded */
+                padding: 30px 15px;
+            }
+            .action-section .btn {
+                padding: 15px 40px;
+                font-size: 1.5em;
+            }
+            .info-text, .price-text {
+                font-size: 1em;
+            }
+            .price-text {
+                font-size: 1.3em;
+            }
+            .section-title {
+                font-size: 1.5em;
+            }
+            .email-display {
+                font-size: 1.2em;
+                padding: 8px 15px;
+            }
+            .note-list {
+                grid-template-columns: 1fr; /* Stack notes on small screens */
+            }
+            .note-item {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .site-title {
+                font-size: 2.8em;
+            }
+            .tagline {
+                font-size: 0.9em;
+            }
+            .action-section .btn {
+                padding: 12px 30px;
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="doodleCanvas"></canvas>
+
+    <div class="fixed-header">
+        <img src="nw.png" alt="Notes Wranglers Logo" class="logo">
+    </div>
+
+    <div class="main-wrapper">
+        <header class="header">
+            <h1 class="site-title">NOTES WRANGLERS</h1>
+            <p class="tagline">THE BEST PLACE FOR HANDWRITTEN NOTES</p>
+        </header>
+
+        <main class="content-oval">
+            <section class="section action-section">
+                <a href="form.html" class="btn upload-btn" target="_blank">GET NOW</a>
+                <p class="info-text">Go to Insta Profile for Notes</p>
+                <p class="price-text">8 RS PAGE</p>
+            </section>
+
+            <section class="section order-instructions">
+                <h2 class="section-title">Ordering Notes:</h2>
+                <p>1. DM us on Instagram for the notes you need.</p>
+                <a href="https://www.instagram.com/noteswranglers?igsh=MWNtMHQzOHhma2NjNw==" class="btn instagram-btn" target="_blank">Our Instagram Profile</a>
+                <p>2. After confirming your order, send your PDF request to: noteswranglers30@gmail.com</p>
+                <p class="email-display">noteswranglers30@gmail.com</p>
+            </section>
+
+        
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Notes Wranglers. All rights reserved.</p>
+            <p><a href="https://noteswranglers.netlify.app" target="_blank">noteswranglers.netlify.app</a></p>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('doodleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas dimensions to full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Function to draw random doodles
+        function drawDoodles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas for redraw
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; // White with transparency
+            ctx.lineWidth = 2;
+
+            const numberOfDoodles = 15; // Adjust as needed
+            for (let i = 0; i < numberOfDoodles; i++) {
+                ctx.beginPath();
+                // Random start point
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                ctx.moveTo(startX, startY);
+
+                // Draw a series of connected lines
+                const segments = Math.floor(Math.random() * 3) + 2; // 2 to 4 segments
+                for (let j = 0; j < segments; j++) {
+                    const endX = startX + (Math.random() - 0.5) * 200; // Random x offset
+                    const endY = startY + (Math.random() - 0.5) * 200; // Random y offset
+                    ctx.lineTo(endX, endY);
+                }
+                ctx.stroke();
+            }
+        }
+
+        // Draw doodles initially and on window resize
+        drawDoodles();
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawDoodles();
+        });
+    </script>
+</body>
+</html>
